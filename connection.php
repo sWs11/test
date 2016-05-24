@@ -6,9 +6,9 @@
 	
 
 	$host = 'localhost'; // адрес сервера 
-	$user = 'root'; // имя пользователя
+	$user = 'root'; // і'мя користувача
 	$password = ''; // пароль
-	$database = 'company'; // имя базы данных
+	$database = 'company'; //і'мя имя бази даних
 	
 	
 	
