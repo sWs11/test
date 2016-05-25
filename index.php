@@ -17,7 +17,6 @@
 		delSelect();// Видалення компанії	
 		changeCompany();//Редагування компанії
 		insertInto();//Додавання компанії
-//		test();
 		selestForPrint();//Вибірка компаній
 	
 	?>
@@ -36,7 +35,6 @@
 				printSelect();
 			?>
 		</select>
-		
 		
 		<input type="submit" name="add" value="Добавити"/>
 	</form>

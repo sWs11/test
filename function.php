@@ -1,4 +1,6 @@
 <?php 
+	global $cou;
+	$cou = 0;
 	require_once 'connection.php';
 	
 	function connect(){
@@ -47,12 +49,7 @@
 	function printBlock($num_rows, $result){
 		
 		for($i = 0; $i < $num_rows; $i++){
-			
-			/*if($i = 0){
-				global $counter;
-				$counter = 0;
-			}*/
-			
+
 			$row = mysqli_fetch_assoc($result);
 			
 			$parent_name = $row['name_company'];
@@ -62,11 +59,9 @@
 			$capital_family = $capital_family + $row["Capital"];
 
 			$level = $row["level"];
-			echo($level."<br>");
-		
-			global $margin;
-			$isChild = findChildren($parent_name, true);
+//			echo($level."<br>");
 			
+			global $cou;
 			global $margin;
 			echo("<div class='company_block' style = 'margin-left: ".$margin*$level."px'>");
 			
@@ -76,13 +71,13 @@
 			if($row["parent"] !== ""){
 				echo("<div class='intro_block'><b>Parent: </b>".$row["parent"]."</div>");
 			}
-			echo("</div>");
+			echo("".++$cou."</div>");
 			
 			findChildren($parent_name);
 		}
 	}
 	
-	function findChildren($parent_name, $prev = false){
+	function findChildren($parent_name){
 		connect();
 		global $mysqli;
 		$query ="SELECT * FROM `table_company` WHERE `parent` = '$parent_name' ";
@@ -91,12 +86,71 @@
 		
 		deConect();
 		
-		if($prev){
-			return $num_rows;
-		}	
-//		global $counter;
-//		$counter++;
 		printBlock($num_rows, $result);
+		
+	}
+	
+	function delSelect(){
+		if(isset($_POST['delSelect'])){
+			$delCompany = $_POST['delSelect'];
+			connect();
+            global $mysqli;
+            $query = "SELECT * FROM `table_company` WHERE `table_company`.`id` = $delCompany";
+            $result = mysqli_query($mysqli, $query)or die("<p style = 'color: red; font-size: 130%;'>Помилка при видаленні даних в БД 1</p>");
+            $num_rows = mysqli_num_rows($result);
+			
+			deConect();
+			
+            delChildren($result, $num_rows);
+            
+			/*$query = "DELETE FROM `table_company` WHERE `table_company`.`id` = $delCompany";
+			 echo $delCompany;
+			
+			$result = mysqli_query($mysqli, $query)or die("<p style = 'color: red; font-size: 130%;'>Помилка при видаленні даних в БД 2</p>");
+			
+			if($result){
+				echo("<p style = 'color: green; font-size: 110%;'>Дані видалено!</p>");
+			}else{
+				echo("<p style = 'color: red; font-size: 130%;'>Дані не видалено!</p>");
+			}*/			
+			
+		}
+	}
+	
+	function delChildren($result, $num_rows){
+
+		for($i = 0; $i < $num_rows; $i++){
+
+			$row = mysqli_fetch_assoc($result);
+			$parent_name = $row['name_company'];
+			$delCompany = $row['id'];
+			
+			$query = "DELETE FROM `table_company` WHERE `name_company` = '$parent_name'";
+			connect();
+			global $mysqli;
+			$resultDel = mysqli_query($mysqli, $query)or die ("<p style = 'color: red; font-size: 130%;'>Помилка при видаленні даних в БД 2</p>");
+			deConect();
+			if($resultDel){
+				echo("<p style = 'color: green; font-size: 110%;'>$parent_name видалено!</p>");
+			}else{
+				echo("<p style = 'color: red; font-size: 130%;'>Дані не видалено!</p>");
+			}
+			
+			findChildrenForDel($parent_name);
+		}
+	}
+	
+	function findChildrenForDel($parent_name){
+		connect();
+		global $mysqli;
+		$query ="SELECT * FROM `table_company` WHERE `parent` = '$parent_name' ";
+		$result = mysqli_query($mysqli, $query)or die('Помилка при виборі даних з БД');
+		$num_rows = mysqli_num_rows($result);
+		
+		deConect();
+		
+		delChildren($result, $num_rows);
+		
 	}
 	
 	function sumCapitalFamily($parent_name){
@@ -137,17 +191,18 @@
 				$parentId = $_POST['addParent'];
 				// Вибірка для встановлення предка компанії
 				$query ="SELECT * FROM `table_company` WHERE `id` = $parentId ";
-				$result = mysqli_query($mysqli, $query)or die('Помилка при додаванні даних в БД');
+				$result = mysqli_query($mysqli, $query)or die('Помилка при додаванні даних в БД 1');
 				$parent_name = mysqli_fetch_assoc($result);
 				$parent = $parent_name['name_company'];
 				$level = $parent_name['level'];
 				$level = $level + 1;
+//				echo($level);
 				$query ="INSERT INTO `table_company` (`id`, `name_company`, `Capital`, `parent`, `level`) VALUES (NULL, '$name_company', '$capital', '$parent', '$level')";
 			}else{
 				$query ="INSERT INTO `table_company` (`id`, `name_company`, `Capital`) VALUES (NULL, '$name_company', '$capital')";
 			}
 	
-			$result = mysqli_query($mysqli, $query)or die('Помилка при додаванні даних в БД');
+			$result = mysqli_query($mysqli, $query)or die('Помилка при додаванні даних в БД 2');
 			
 			if($result){
 				echo("Дані додано!<br>");
@@ -167,25 +222,7 @@
 		}
 	}
 	
-	function delSelect(){
-		if(isset($_POST['delSelect'])){
-			
-			$delCompany = $_POST['delSelect'];
-			
-			global $mysqli;
-			
-			connect();
-			$query = "DELETE FROM `table_company` WHERE `table_company`.`id` = $delCompany";
-			$result = mysqli_query($mysqli, $query)or die("<p style = 'color: red; font-size: 130%;'>Помилка при видаленні даних в БД</p>");
-			
-			if($result){
-				echo("<p style = 'color: green; font-size: 110%;'>Дані видалено!</p>");
-			}else{
-				echo("<p style = 'color: red; font-size: 130%;'>Дані не видалено!</p>");
-			}			
-			deConect();		
-		}
-	}
+	
 	
 	function changeCompany(){
 		if(isset($_POST['changeSelect'])){
