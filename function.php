@@ -1,6 +1,6 @@
 <?php 
-	global $cou;
-	$cou = 0;
+//	global $cou;
+//	$cou = 0;
 	require_once 'connection.php';
 	
 	function connect(){
@@ -55,22 +55,20 @@
 			$parent_name = $row['name_company'];
 			
 			$capital_family = sumCapitalFamily($parent_name);
-			
 			$capital_family = $capital_family + $row["Capital"];
 
 			$level = $row["level"];
-//			echo($level."<br>");
-			
-			global $cou;
+
+//			global $cou;
 			global $margin;
 			echo("<div class='company_block' style = 'margin-left: ".$margin*$level."px'>");
 			
-			echo("<div class='intro_block'><b>Name: </b>".$row["name_company"]."</div>");
-			echo("<div class='intro_block'><b>Capital: </b>".$row["Capital"]."</div>");
-			echo("<div class='intro_block'><b>Cap. fam.: </b>".$capital_family."</div>");
-			if($row["parent"] !== ""){
-				echo("<div class='intro_block'><b>Parent: </b>".$row["parent"]."</div>");
-			}
+				echo("<div class='intro_block'><b>Name: </b>".$row["name_company"]."</div>");
+				echo("<div class='intro_block'><b>Capital: </b>".$row["Capital"]."</div>");
+				echo("<div class='intro_block'><b>Cap. fam.: </b>".$capital_family."</div>");
+				if($row["parent"] !== ""){
+					echo("<div class='intro_block'><b>Parent: </b>".$row["parent"]."</div>");
+				}
 			echo("".++$cou."</div>");
 			
 			findChildren($parent_name);
@@ -87,7 +85,6 @@
 		deConect();
 		
 		printBlock($num_rows, $result);
-		
 	}
 	
 	function delSelect(){
@@ -102,18 +99,6 @@
 			deConect();
 			
             delChildren($result, $num_rows);
-            
-			/*$query = "DELETE FROM `table_company` WHERE `table_company`.`id` = $delCompany";
-			 echo $delCompany;
-			
-			$result = mysqli_query($mysqli, $query)or die("<p style = 'color: red; font-size: 130%;'>Помилка при видаленні даних в БД 2</p>");
-			
-			if($result){
-				echo("<p style = 'color: green; font-size: 110%;'>Дані видалено!</p>");
-			}else{
-				echo("<p style = 'color: red; font-size: 130%;'>Дані не видалено!</p>");
-			}*/			
-			
 		}
 	}
 	
@@ -135,7 +120,6 @@
 			}else{
 				echo("<p style = 'color: red; font-size: 130%;'>Дані не видалено!</p>");
 			}
-			
 			findChildrenForDel($parent_name);
 		}
 	}
@@ -150,7 +134,6 @@
 		deConect();
 		
 		delChildren($result, $num_rows);
-		
 	}
 	
 	function sumCapitalFamily($parent_name){
@@ -165,7 +148,6 @@
 		deConect();
 		
 		$sum = 0;
-			
 		for($i = 0; $i < $num_rows; $i++){
 			$row = mysqli_fetch_assoc($result);
 			$name_company[$i] = $row["name_company"];
@@ -173,7 +155,6 @@
 			$a[$i] = $row["Capital"];
 			$sum = $sum + $a[$i] + $var;
 		}
-
 		return $sum;
 	}
 	
@@ -196,7 +177,6 @@
 				$parent = $parent_name['name_company'];
 				$level = $parent_name['level'];
 				$level = $level + 1;
-//				echo($level);
 				$query ="INSERT INTO `table_company` (`id`, `name_company`, `Capital`, `parent`, `level`) VALUES (NULL, '$name_company', '$capital', '$parent', '$level')";
 			}else{
 				$query ="INSERT INTO `table_company` (`id`, `name_company`, `Capital`) VALUES (NULL, '$name_company', '$capital')";
@@ -222,14 +202,8 @@
 		}
 	}
 	
-	
-	
 	function changeCompany(){
 		if(isset($_POST['changeSelect'])){
-			/*echo("POST id= ".$_POST['changeSelect']."<br>");
-			echo("POST new name = ".$_POST['new_name_company']."<br>");
-			echo("POST new capital = ".$_POST['new_capital']."<br>");
-			echo("POST changeParent = ".$_POST['changeParent']."<br>");*/
 			
 			$changeCompanyId = $_POST['changeSelect'];
 			$changeCompanyNewName = $_POST['new_name_company'];
@@ -257,7 +231,6 @@
 			}else{
 				$newNameParent = "";
 				$level = 0;
-
 			}
 			$query = "UPDATE `table_company` SET `name_company` = '$changeCompanyNewName', `Capital` = '$changeCompanyNewCapital', `parent` = '$newNameParent', `level` = '$level' WHERE `id` = $changeCompanyId";
 			$result = mysqli_query($mysqli, $query)/*or die('Помилка при зміні даних в БД')*/;

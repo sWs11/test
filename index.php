@@ -1,12 +1,9 @@
 <!DOCTYPE HTML>
-<html lang="en-US">
+<html>
 <head>
 	<meta charset="UTF-8">
-	<title>Comapny list</title>
+	<title>Сompanies tree</title>
 	<link href="style.css" rel="stylesheet">
-	<script type="text/javascript" >
-		
-	</script>
 </head>
 <body>
 <div class="left_block">
@@ -18,7 +15,6 @@
 		changeCompany();//Редагування компанії
 		insertInto();//Додавання компанії
 		selestForPrint();//Вибірка компаній
-	
 	?>
 	<div class="clear"></div>
 </div>	
