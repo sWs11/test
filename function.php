@@ -69,7 +69,7 @@
 				if($row["parent"] !== ""){
 					echo("<div class='intro_block'><b>Parent: </b>".$row["parent"]."</div>");
 				}
-			echo("".++$cou."</div>");
+			echo("</div>");
 			
 			findChildren($parent_name);
 		}
@@ -161,33 +161,37 @@
 	function insertInto(){
 		
 		if(isset($_POST['name_company'])&&isset($_POST['capital'])){
-			
-			global $mysqli;
-			connect();
-			
 			$name_company = $_POST['name_company'];
 			$capital = $_POST['capital'];
 			
-			if($_POST['addParent'] !== "noselected"){
-				$parentId = $_POST['addParent'];
-				// Вибірка для встановлення предка компанії
-				$query ="SELECT * FROM `table_company` WHERE `id` = $parentId ";
-				$result = mysqli_query($mysqli, $query)or die('Помилка при додаванні даних в БД 1');
-				$parent_name = mysqli_fetch_assoc($result);
-				$parent = $parent_name['name_company'];
-				$level = $parent_name['level'];
-				$level = $level + 1;
-				$query ="INSERT INTO `table_company` (`id`, `name_company`, `Capital`, `parent`, `level`) VALUES (NULL, '$name_company', '$capital', '$parent', '$level')";
+			if(!(($name_company == "") || ($capital == ""))){
+				
+				global $mysqli;
+				connect();
+				
+				if($_POST['addParent'] !== "noselected"){
+					$parentId = $_POST['addParent'];
+					// Вибірка для встановлення предка компанії
+					$query ="SELECT * FROM `table_company` WHERE `id` = $parentId ";
+					$result = mysqli_query($mysqli, $query)or die('Помилка при додаванні даних в БД 1');
+					$parent_name = mysqli_fetch_assoc($result);
+					$parent = $parent_name['name_company'];
+					$level = $parent_name['level'];
+					$level = $level + 1;
+					$query ="INSERT INTO `table_company` (`id`, `name_company`, `Capital`, `parent`, `level`) VALUES (NULL, '$name_company', '$capital', '$parent', '$level')";
+				}else{
+					$query ="INSERT INTO `table_company` (`id`, `name_company`, `Capital`) VALUES (NULL, '$name_company', '$capital')";
+				}
+		
+				$result = mysqli_query($mysqli, $query)or die('Помилка при додаванні даних в БД 2');
+				
+				if($result){
+					echo("Дані додано!<br>");
+				}else{
+					echo("Дані не додано!<br>");
+				}
 			}else{
-				$query ="INSERT INTO `table_company` (`id`, `name_company`, `Capital`) VALUES (NULL, '$name_company', '$capital')";
-			}
-	
-			$result = mysqli_query($mysqli, $query)or die('Помилка при додаванні даних в БД 2');
-			
-			if($result){
-				echo("Дані додано!<br>");
-			}else{
-				echo("Дані не додано!<br>");
+				echo("Для додовання компанії необхідно спочатку ввсести її назву і капітал!");
 			}
 		}	
 	}
@@ -227,7 +231,7 @@
 				$newNameParent = $newParent['name_company'];
 				$changeLevelParent = $newParent['level'];
 				$level = $changeLevelParent + 1;
-				echo("newParent[level] = ". $changeLevelParent."<br>");
+//				echo("newParent[level] = ". $changeLevelParent."<br>");
 			}else{
 				$newNameParent = "";
 				$level = 0;
